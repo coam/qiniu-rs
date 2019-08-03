@@ -12,44 +12,63 @@ use data_encoding::BASE64URL;
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct PutPolicy {
-    pub scope: String,                           // Bucket
+    pub scope: String,
+    // Bucket
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub is_prefixal_scope: Option<i32>,          // IsPrefixalScope
-    pub deadline: u32,                           // UnixTimestamp
+    pub is_prefixal_scope: Option<i32>,
+    // IsPrefixalScope
+    pub deadline: u32,
+    // UnixTimestamp
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub insert_only: Option<i32>,                // AllowFileUpdating
+    pub insert_only: Option<i32>,
+    // AllowFileUpdating
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub end_user: Option<String>,                // EndUserId
+    pub end_user: Option<String>,
+    // EndUserId
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub return_url: Option<String>,              // RedirectURL
+    pub return_url: Option<String>,
+    // RedirectURL
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub return_body: Option<String>,             // ResponseBodyForAppClient
+    pub return_body: Option<String>,
+    // ResponseBodyForAppClient
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub callback_url: Option<String>,            // RequestUrlForAppServer
+    pub callback_url: Option<String>,
+    // RequestUrlForAppServer
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub callback_host: Option<String>,           // RequestHostForAppServer
+    pub callback_host: Option<String>,
+    // RequestHostForAppServer
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub callback_body: Option<String>,           // RequestBodyForAppServer
+    pub callback_body: Option<String>,
+    // RequestBodyForAppServer
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub callback_body_type: Option<String>,      // RequestBodyTypeForAppServer
+    pub callback_body_type: Option<String>,
+    // RequestBodyTypeForAppServer
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub persistent_ops: Option<String>,          // PersistentOpsCmds
+    pub persistent_ops: Option<String>,
+    // PersistentOpsCmds
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub persistent_notify_url: Option<String>,   // PersistentNotifyUrl
+    pub persistent_notify_url: Option<String>,
+    // PersistentNotifyUrl
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub persistent_pipeline: Option<String>,     // PersistentPipeline
+    pub persistent_pipeline: Option<String>,
+    // PersistentPipeline
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub save_key: Option<String>,                // SaveKey
+    pub save_key: Option<String>,
+    // SaveKey
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub fsize_min: Option<i64>,                  // FileSizeMin
+    pub fsize_min: Option<i64>,
+    // FileSizeMin
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub fsize_limit: Option<i64>,                // FileSizeLimit
+    pub fsize_limit: Option<i64>,
+    // FileSizeLimit
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub detect_mime: Option<i32>,                // AutoDetectMimeType
+    pub detect_mime: Option<i32>,
+    // AutoDetectMimeType
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub mime_limit: Option<String>,              // MimeLimit
+    pub mime_limit: Option<String>,
+    // MimeLimit
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub file_type: Option<i32>                   // FileType
+    pub file_type: Option<i32>,                   // FileType
 }
 
 impl PutPolicy {
@@ -74,7 +93,7 @@ impl PutPolicy {
             fsize_limit: None,
             detect_mime: None,
             mime_limit: None,
-            file_type: None
+            file_type: None,
         }
     }
 
@@ -83,7 +102,6 @@ impl PutPolicy {
     }
 
     pub fn generate_uptoken(&self, config: &Config) -> String {
-
         let sign_key = hmac::SigningKey::new(&SHA1, config.secret_key.as_bytes());
 
         let self_base64 = self.to_base64();
@@ -99,18 +117,33 @@ impl PutPolicy {
             self_base64
         )
     }
+
+    // 七牛 CDN 接口授权Token
+    pub fn generate_cdn_token(&self, config: &Config, sign_uri: &str) -> String {
+
+        // 创建签名 key
+        let sign_key = hmac::SigningKey::new(&SHA1, config.secret_key.as_bytes());
+
+        // 创建签名
+        let signature = hmac::sign(&sign_key, sign_uri.as_bytes());
+
+        // base64_encode 编码
+        let signature_base64_encode = data_encoding::BASE64URL.encode(signature.as_ref());
+
+        format!("{}:{}", config.access_key, signature_base64_encode)
+    }
 }
 
 pub struct Config {
     pub access_key: String,
-    pub secret_key: String
+    pub secret_key: String,
 }
 
 impl Config {
     pub fn new<S: Into<String>>(access_key: S, secret_key: S) -> Config {
         Config {
             access_key: access_key.into(),
-            secret_key: secret_key.into()
+            secret_key: secret_key.into(),
         }
     }
 }
