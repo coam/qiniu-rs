@@ -9,6 +9,30 @@ use ring::hmac;
 use ring::digest::SHA1;
 use data_encoding::BASE64URL;
 
+pub struct Config {
+    pub access_key: String,
+    pub secret_key: String,
+}
+
+impl Config {
+    pub fn new<S: Into<String>>(access_key: S, secret_key: S) -> Config {
+        Config {
+            access_key: access_key.into(),
+            secret_key: secret_key.into(),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ResponseBodyForAppClient {
+    pub name: String,
+    pub size: String,
+    pub w: String,
+    pub h: String,
+    pub hash: String,
+}
+
+// [Field attributes](https://serde.rs/field-attrs.html)
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct PutPolicy {
@@ -30,6 +54,7 @@ pub struct PutPolicy {
     // RedirectURL
     #[serde(skip_serializing_if = "Option::is_none")]
     pub return_body: Option<String>,
+    //pub return_body: Option<ResponseBodyForAppClient>,
     // ResponseBodyForAppClient
     #[serde(skip_serializing_if = "Option::is_none")]
     pub callback_url: Option<String>,
@@ -72,7 +97,7 @@ pub struct PutPolicy {
 }
 
 impl PutPolicy {
-    pub fn new<S: Into<String>>(scope: S, deadline: u32) -> PutPolicy {
+    pub fn new<S: Into<String>>(scope: S, deadline: u32, response_body: String) -> PutPolicy {
         PutPolicy {
             scope: scope.into(),
             is_prefixal_scope: None,
@@ -80,7 +105,7 @@ impl PutPolicy {
             insert_only: None,
             end_user: None,
             return_url: None,
-            return_body: None,
+            return_body: Some(response_body),
             callback_url: None,
             callback_host: None,
             callback_body: None,
@@ -97,18 +122,38 @@ impl PutPolicy {
         }
     }
 
+    // EncodedEntryURI
+    pub fn urlsafe_base64_encode(origin_str: String) -> String {
+        //let ssss = serde_json::to_vec(&self).unwrap();
+        //let pkey_s = String::from_utf8_lossy(&ssss);
+        //println!("==============>{:?}", pkey_s);
+
+        BASE64URL.encode(origin_str.as_str().as_bytes())
+    }
+
     pub fn to_base64(&self) -> String {
+        //let ssss = serde_json::to_vec(&self).unwrap();
+        //let pkey_s = String::from_utf8_lossy(&ssss);
+        //println!("==============>{:?}", pkey_s);
+
         BASE64URL.encode(&serde_json::to_vec(&self).unwrap())
     }
 
     pub fn generate_uptoken(&self, config: &Config) -> String {
         let sign_key = hmac::SigningKey::new(&SHA1, config.secret_key.as_bytes());
+        //println!("sign_key---------------->sign_key: {:?}", sign_key.to_string());
 
         let self_base64 = self.to_base64();
+        println!("self_base64---------------->self_base64: {:?}", self_base64);
 
         let signature = hmac::sign(&sign_key, self_base64.as_bytes());
+        println!("signature---------------->signature: {:?}", signature);
+
+        //let ss = hash(MessageDigest::sha1(), self_base64.as_bytes());
+        //println!("ss---------------->ss: {:?}", ss);
 
         let signature_base64 = data_encoding::BASE64URL.encode(signature.as_ref());
+        println!("signature_base64---------------->signature_base64: {:?}", signature_base64);
 
         format!(
             "{}:{}:{}",
@@ -119,6 +164,7 @@ impl PutPolicy {
     }
 
     // 七牛 CDN 接口授权Token
+    // [管理凭证](https://developer.qiniu.com/kodo/manual/1201/access-token)
     pub fn generate_cdn_token(&self, config: &Config, sign_uri: &str) -> String {
 
         // 创建签名 key
@@ -134,16 +180,4 @@ impl PutPolicy {
     }
 }
 
-pub struct Config {
-    pub access_key: String,
-    pub secret_key: String,
-}
 
-impl Config {
-    pub fn new<S: Into<String>>(access_key: S, secret_key: S) -> Config {
-        Config {
-            access_key: access_key.into(),
-            secret_key: secret_key.into(),
-        }
-    }
-}
