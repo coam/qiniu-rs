@@ -6,7 +6,7 @@ extern crate serde_json;
 extern crate serde_derive;
 
 use ring::hmac;
-use ring::digest::SHA1;
+//use ring::digest::SHA1;
 use data_encoding::BASE64URL;
 
 pub struct Config {
@@ -140,7 +140,7 @@ impl PutPolicy {
     }
 
     pub fn generate_uptoken(&self, config: &Config) -> String {
-        let sign_key = hmac::SigningKey::new(&SHA1, config.secret_key.as_bytes());
+        let sign_key = hmac::Key::new(hmac::HMAC_SHA1_FOR_LEGACY_USE_ONLY, config.secret_key.as_bytes());
         //println!("sign_key---------------->sign_key: {:?}", sign_key.to_string());
 
         let self_base64 = self.to_base64();
@@ -168,7 +168,7 @@ impl PutPolicy {
     pub fn generate_cdn_token(&self, config: &Config, sign_uri: &str) -> String {
 
         // 创建签名 key
-        let sign_key = hmac::SigningKey::new(&SHA1, config.secret_key.as_bytes());
+        let sign_key = hmac::Key::new(hmac::HMAC_SHA1_FOR_LEGACY_USE_ONLY, config.secret_key.as_bytes());
 
         // 创建签名
         let signature = hmac::sign(&sign_key, sign_uri.as_bytes());
