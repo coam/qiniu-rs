@@ -140,9 +140,9 @@ impl PutPolicy {
 
     pub fn generate_uptoken(&self, config: &Config) -> String {
         // [0.16.9]
-        //let sign_key = hmac::Key::new(hmac::HMAC_SHA1_FOR_LEGACY_USE_ONLY, config.secret_key.as_bytes());
+        let sign_key = hmac::Key::new(hmac::HMAC_SHA1_FOR_LEGACY_USE_ONLY, config.secret_key.as_bytes());
         // [0.13.5]
-        let sign_key = hmac::SigningKey::new(&ring::digest::SHA1, config.secret_key.as_bytes());
+        // let sign_key = hmac::SigningKey::new(&ring::digest::SHA1, config.secret_key.as_bytes());
 
         //println!("sign_key---------------->sign_key: {:?}", sign_key.to_string());
 
@@ -172,9 +172,9 @@ impl PutPolicy {
 
         // 创建签名 key
         // [0.16.9]
-        //let sign_key = hmac::Key::new(hmac::HMAC_SHA1_FOR_LEGACY_USE_ONLY, config.secret_key.as_bytes());
+        let sign_key = hmac::Key::new(hmac::HMAC_SHA1_FOR_LEGACY_USE_ONLY, config.secret_key.as_bytes());
         // [0.13.5]
-        let sign_key = hmac::SigningKey::new(&ring::digest::SHA1, config.secret_key.as_bytes());
+        // let sign_key = hmac::SigningKey::new(&ring::digest::SHA1, config.secret_key.as_bytes());
 
         // 创建签名
         let signature = hmac::sign(&sign_key, sign_uri.as_bytes());
