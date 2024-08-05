@@ -1,19 +1,19 @@
 [package]
-name            = "qiniu"
-version         = "0.1.2"
-license         = "MIT"
-authors         = ["mitum <dangcheng@hotmail.com>"]
-description     = "qiniu"
-documentation   = "https://docs.rs/qiniu"
-homepage        = "https://github.com/mitum/qiniu"
-repository      = "https://github.com/mitum/qiniu-rs"
-readme          = "README.md"
-keywords        = ["qiniu", "cdn"]
-exclude         = [
-  ".gitignore",
-  ".travis.yml",
-  "deploy.sh",
-  "test/**/*",
+name = "qiniu"
+version = "0.1.2"
+license = "MIT"
+authors = ["mitum <dangcheng@hotmail.com>"]
+description = "qiniu"
+documentation = "https://docs.rs/qiniu"
+homepage = "https://github.com/mitum/qiniu"
+repository = "https://github.com/mitum/qiniu-rs"
+readme = "README.md"
+keywords = ["qiniu", "cdn"]
+exclude = [
+    ".gitignore",
+    ".travis.yml",
+    "deploy.sh",
+    "test/**/*",
 ]
 
 [dependencies]

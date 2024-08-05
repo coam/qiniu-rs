@@ -1,12 +1,12 @@
-extern crate ring;
 extern crate data_encoding;
+extern crate ring;
 extern crate serde;
 extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 
-use ring::hmac;
 use data_encoding::BASE64URL;
+use ring::hmac;
 
 pub struct Config {
     pub access_key: String,
@@ -92,7 +92,7 @@ pub struct PutPolicy {
     pub mime_limit: Option<String>,
     // MimeLimit
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub file_type: Option<i32>,                   // FileType
+    pub file_type: Option<i32>, // FileType
 }
 
 impl PutPolicy {
@@ -158,18 +158,12 @@ impl PutPolicy {
         let signature_base64 = data_encoding::BASE64URL.encode(signature.as_ref());
         println!("signature_base64---------------->signature_base64: {:?}", signature_base64);
 
-        format!(
-            "{}:{}:{}",
-            config.access_key,
-            signature_base64,
-            self_base64
-        )
+        format!("{}:{}:{}", config.access_key, signature_base64, self_base64)
     }
 
     // 七牛 CDN 接口授权Token
     // [管理凭证](https://developer.qiniu.com/kodo/manual/1201/access-token)
     pub fn generate_cdn_token(&self, config: &Config, sign_uri: &str) -> String {
-
         // 创建签名 key
         // [0.16.9]
         let sign_key = hmac::Key::new(hmac::HMAC_SHA1_FOR_LEGACY_USE_ONLY, config.secret_key.as_bytes());
@@ -185,5 +179,3 @@ impl PutPolicy {
         format!("{}:{}", config.access_key, signature_base64_encode)
     }
 }
-
-
