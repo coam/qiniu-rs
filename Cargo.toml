@@ -3,6 +3,7 @@ name = "qiniu"
 version = "0.1.2"
 license = "MIT"
 authors = ["mitum <dangcheng@hotmail.com>"]
+edition = "2021"
 description = "qiniu"
 documentation = "https://docs.rs/qiniu"
 homepage = "https://github.com/mitum/qiniu"
