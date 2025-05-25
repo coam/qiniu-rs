@@ -10,12 +10,7 @@ homepage = "https://github.com/mitum/qiniu"
 repository = "https://github.com/mitum/qiniu-rs"
 readme = "README.md"
 keywords = ["qiniu", "cdn"]
-exclude = [
-    ".gitignore",
-    ".travis.yml",
-    "deploy.sh",
-    "test/**/*",
-]
+exclude = [".gitignore", ".travis.yml", "deploy.sh", "test/**/*"]
 
 [dependencies]
 ring = "0.16.19"
